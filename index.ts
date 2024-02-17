@@ -30,7 +30,7 @@ app.use("/api/v1", rootRouter);
 // ** global error handler
 app.use(
 	(err: CustomError, _req: Request, res: Response, next: NextFunction) => {
-		// console.log(err);
+		console.log(err);
 
 		// ** if headers already sent
 		if (res.headersSent) {

@@ -38,6 +38,7 @@ const create_profile_controller = async (
 ) => {
 	try {
 		const user_info: any = req.headers.user;
+
 		const req_body = { ...req.body, user_id: user_info?.id, user_info };
 
 		const profile = await create_profile_service(req_body);

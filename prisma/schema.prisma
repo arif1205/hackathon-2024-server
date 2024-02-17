@@ -36,11 +36,13 @@ model StudentInfo {
 model TeacherInfo {
   id               String     @id @default(uuid())
   user_id          String     @unique
+  user_info        Json?
   ratingCum        RatingCum?
   is_student       IsStudent
   job_or_institute String
   experience       Float
   experties        String[]
+  hourly_rate      Float
   Rating           Rating?
   Class            Class?
   Payment          Payment?
