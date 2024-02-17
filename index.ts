@@ -6,15 +6,21 @@ import rootRouter from "./router/root.router";
 import { getErrorResponse } from "./services/error.services";
 import { CustomError } from "./index.d";
 import fileupload from "express-fileupload";
+import { cloudinary_config } from "./config/cloudinary.config";
 
 //For env File
 dotenv.config();
+cloudinary_config();
 
 const app: Application = express();
 const port = process.env.PORT || 8000;
 
 app.use(cors());
-app.use(fileupload());
+app.use(
+	fileupload({
+		useTempFiles: true,
+	})
+);
 app.use(express.static(path.join(__dirname, "/public")));
 
 app.use(express.json());

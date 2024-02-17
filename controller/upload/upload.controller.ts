@@ -1,8 +1,11 @@
 import { NextFunction, Request, Response } from "express";
-import { create_profile_service } from "../../services/student.services";
-import axios from "axios";
 import { CustomError } from "../../custom-class/CustomError";
-import { createReadStream } from "fs";
+import { v2 as cloudinary } from "cloudinary";
+import {
+	validate_file_size,
+	validate_image_file,
+	validate_pdf_file,
+} from "../../lib/validation";
 
 const upload_controller = async (
 	req: Request,
@@ -11,26 +14,28 @@ const upload_controller = async (
 ) => {
 	try {
 		const file: any = req.files;
+
 		if (!file) {
-			return res.status(400).json({ message: "No file selected" });
+			return res.status(400).json({ message: "No file uploaded" });
 		}
-		// ** create a form data
-		const form = new FormData();
-		form.append("file", file?.file);
-		console.log(form.get("file"));
 
-		const file_res = await axios.post(`${process.env.FILE_API}/upload`, form, {
-			headers: {
-				"Content-Type": `multipart/form-data`,
-			},
-		});
-		// console.log(file_res);
+		const filetype = file?.file?.mimetype;
+		if (
+			(!validate_image_file(filetype) && !validate_pdf_file(filetype)) ||
+			!validate_file_size(file?.file?.size)
+		) {
+			return res.status(400).json({ message: "Invalid file type or size" });
+		}
 
-		res.status(201).json({
-			status: 201,
-			message: "Profile Created Successfully",
-			profile: file_res,
-		});
+		cloudinary.uploader.upload(
+			file?.file?.tempFilePath,
+			function (error: any, result: any) {
+				if (error) {
+					throw error;
+				}
+				res.json({ message: "File uploaded successfully", data: result?.url });
+			}
+		);
 	} catch (err: any) {
 		if (err?.response?.data?.message || err?.message) {
 			const error = new CustomError(
