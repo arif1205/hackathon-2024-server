@@ -1,9 +1,35 @@
-import { NextFunction, Response, Request } from "express";
-import { create_experties_service } from "../../services/experties.service";
+import { NextFunction, Request, Response } from "express";
 import {
 	create_profile_service,
+	get_profile_service,
 	update_profile_service,
 } from "../../services/student.services";
+
+const get_profile_controller = async (
+	req: Request,
+	res: Response,
+	next: NextFunction
+) => {
+	try {
+		const user_info: any = req.headers.user;
+
+		const profile = await get_profile_service(user_info?.id);
+
+		if (!profile)
+			return res.status(404).json({
+				status: 404,
+				message: "Profile not found",
+			});
+
+		res.status(201).json({
+			status: 200,
+			message: "Profile found Successfully",
+			profile,
+		});
+	} catch (err: any) {
+		next(err);
+	}
+};
 
 const create_profile_controller = async (
 	req: Request,
@@ -18,7 +44,7 @@ const create_profile_controller = async (
 
 		res.status(201).json({
 			status: 201,
-			message: "Profile Created Successfully",
+			message: "Profile created Successfully",
 			profile,
 		});
 	} catch (err: any) {
@@ -35,8 +61,8 @@ const update_profile_controller = async (
 		const user_id = req.params.id;
 
 		const experties = await update_profile_service({ user_id, data: req.body });
-		res.status(201).json({
-			status: 201,
+		res.status(204).json({
+			status: 204,
 			message: "Profile Updated Successfully",
 			experties,
 		});
@@ -45,4 +71,8 @@ const update_profile_controller = async (
 	}
 };
 
-export default { update_profile_controller, create_profile_controller };
+export default {
+	update_profile_controller,
+	create_profile_controller,
+	get_profile_controller,
+};

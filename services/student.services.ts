@@ -1,5 +1,16 @@
 import prisma from "../db/db_client";
 
+export const get_profile_service = async (user_id: string) => {
+	try {
+		const profile = await prisma.studentInfo.findUnique({
+			where: { user_id },
+		});
+		return profile;
+	} catch (err) {
+		throw err;
+	}
+};
+
 export const create_profile_service = async (body: any) => {
 	try {
 		const profile = await prisma.studentInfo.create({
