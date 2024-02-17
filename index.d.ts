@@ -3,3 +3,8 @@ export interface CustomError extends Error {
 }
 
 export type Role = "admin" | "user";
+
+export interface Experties {
+	name: string;
+	type: "predefined" | "custom";
+}
