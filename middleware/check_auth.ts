@@ -9,7 +9,8 @@ export const check_auth = (req: any, res: any, next: any) => {
 		}
 		const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-		req.user = decoded;
+		// req.user = decoded;
+		req.headers = { ...req.headers, user: decoded };
 
 		next();
 	} catch (err: any) {

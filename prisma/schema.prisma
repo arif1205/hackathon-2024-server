@@ -21,9 +21,10 @@ enum Role {
 model StudentInfo {
   id              String   @id @default(uuid())
   user_id         String   @unique
-  dp              String
+  user_info       Json?
+  dp              String?
   interests       String[]
-  class           String
+  class           Int
   present_address String
   institute       String
   Rating          Rating?

@@ -27,6 +27,12 @@ export const getErrorResponse = (err: any, status: number) => {
 			status: 403,
 			message: err?.message,
 		};
+	} else if (err.name === "PrismaClientValidationError") {
+		// ** for custom error
+		return {
+			status: 403,
+			message: err?.message?.split("Argument ")[1],
+		};
 	} else if (err.name === "MulterError") {
 		// ** for multer error
 		return {
