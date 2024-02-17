@@ -10,115 +10,117 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id                   String        @id @default(uuid())
-  role                 Role
-  email                String        @unique
-  password             String
-  name                 String
-  dp                   String?       @db.VarChar(500)
-  about                String?
-  createdAt            DateTime      @default(now())
-  updatedAt            DateTime      @updatedAt
-  applicationsReceived Application[] @relation("ApplicationToRelation")
-  applications         Application[] @relation("ApplicantRelation")
-  Application          Application[]
-}
-
-model Shelf {
-  id       String  @id @default(uuid())
-  shelfNum String
-  row      String
-  column   String?
-  items    Items[]
-}
-
-model Items {
-  id         String @id @default(uuid())
-  name       String
-  quantity   Int
-  image      String @db.VarChar(500)
-  location   Shelf  @relation(fields: [locationId], references: [id])
-  locationId String
-}
-
-model Application {
-  id              String            @id @default(uuid())
-  applicant       User              @relation("ApplicantRelation", fields: [applicantId], references: [id])
-  applicantId     String
-  applicationTo   User              @relation("ApplicationToRelation", fields: [applicationToId], references: [id])
-  applicationToId String
-  type            ApplicationType
-  subject         String
-  body            String
-  items           Item[]
-  status          ApplicationStatus
-  phase           ApplicationPhase
-  timeline        Timeline[]
-  User            User?             @relation(fields: [userId], references: [id])
-  userId          String?
-}
-
-model Item {
-  id            String       @id @default(uuid())
-  quantity      Int
-  Application   Application? @relation(fields: [applicationId], references: [id])
-  applicationId String?
-}
-
-model Timeline {
-  id            String           @id @default(uuid())
-  phase         ApplicationPhase
-  timestamp     DateTime         @default(now())
-  Application   Application?     @relation(fields: [applicationId], references: [id])
-  applicationId String?
-}
-
-model Account {
-  id      String @id @default(uuid())
-  balance Float
-}
-
-model Transaction {
-  id        String          @id @default(uuid())
-  type      TransactionType
-  details   String
-  documents Document[]
-}
-
-model Document {
-  id            String      @id @default(uuid())
-  content       String
-  transaction   Transaction @relation(fields: [transactionId], references: [id])
-  transactionId String
-}
-
+// Define the Role enum
 enum Role {
-  store_manager
-  dept_head
   teacher
-  lab_assistant
-  officials
+  student
+  admin
 }
 
-enum ApplicationType {
-  give
-  take
+// Define the StudentInfo model
+model StudentInfo {
+  id              String   @id @default(uuid())
+  user_id         String   @unique
+  dp              String
+  interests       String[]
+  class           String
+  present_address String
+  institute       String
+  Rating          Rating?
+  Class           Class?
+  Payment         Payment?
 }
 
-enum ApplicationStatus {
-  Pending
-  Approved
+// Define the TeacherInfo model
+model TeacherInfo {
+  id               String     @id @default(uuid())
+  user_id          String     @unique
+  ratingCum        RatingCum?
+  is_student       IsStudent
+  job_or_institute String
+  experience       Float
+  experties        String[]
+  Rating           Rating?
+  Class            Class?
+  Payment          Payment?
 }
 
-enum ApplicationPhase {
-  sent_to_store_manager
-  sent_to_head
-  approved_by_head
-  approved_by_store_manager
+// Define the IsStudent enum
+enum IsStudent {
+  yes
+  no
 }
 
-enum TransactionType {
-  expense
-  income
+// Define the RatingCum model
+model RatingCum {
+  id         String      @id @default(uuid())
+  teacher    TeacherInfo @relation(fields: [teacher_id], references: [id])
+  teacher_id String      @unique
+  rating     Float
+}
+
+// Define the Experties model
+model Experties {
+  id   String      @id @default(uuid())
+  name String      @unique
+  type ExpertyType
+}
+
+// Define the ExpertyType enum
+enum ExpertyType {
+  predefined
+  custom
+}
+
+// Define the Rating model
+model Rating {
+  id         String      @id @default(uuid())
+  student    StudentInfo @relation(fields: [student_id], references: [id])
+  student_id String      @unique
+  teacher    TeacherInfo @relation(fields: [teacher_id], references: [id])
+  teacher_id String      @unique
+  rating     Float
+  class      Class       @relation(fields: [classId], references: [id])
+  comment    String?
+  classId    String
+}
+
+// Define the Class model
+model Class {
+  id         String      @id @default(uuid())
+  student    StudentInfo @relation(fields: [student_id], references: [id])
+  student_id String      @unique
+  teacher    TeacherInfo @relation(fields: [teacher_id], references: [id])
+  teacher_id String      @unique
+  duration   Float
+  status     ClassStatus
+  Rating     Rating[]
+  Payment    Payment[]
+}
+
+// Define the ClassStatus enum
+enum ClassStatus {
+  accepted
+  running
+  end
+}
+
+// Define the Payment model
+model Payment {
+  id             String      @id @default(uuid())
+  transaction_id String      @unique
+  student        StudentInfo @relation(fields: [student_id], references: [id])
+  student_id     String      @unique
+  teacher        TeacherInfo @relation(fields: [teacher_id], references: [id])
+  teacher_id     String      @unique
+  class          Class       @relation(fields: [class_id], references: [id])
+  class_id       String
+  amount         Float
+}
+
+// Define the Chat model
+model Chat {
+  id      Int    @id @default(autoincrement())
+  user_id String @unique
+  message Json
 }

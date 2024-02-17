@@ -8,7 +8,6 @@ type RegistrationBody = {
 	role: Role;
 	password: string;
 	about?: string;
-	dp?: string;
 };
 
 export const createUser = async (body: RegistrationBody) => {
@@ -22,7 +21,6 @@ export const createUser = async (body: RegistrationBody) => {
 				email: true,
 				role: true,
 				about: true,
-				dp: true,
 				password: false,
 			},
 		});

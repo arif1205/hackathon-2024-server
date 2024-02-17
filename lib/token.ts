@@ -1,15 +1,6 @@
 import jwt, { TokenExpiredError } from "jsonwebtoken";
 import { CustomError } from "../custom-class/CustomError";
 
-// generate jwt token
-export const generateToken = async (user: any) => {
-	if (process.env.JWT_SECRET)
-		return jwt.sign(user, process.env.JWT_SECRET, {
-			expiresIn: "1d",
-		});
-	else throw new CustomError("Couldn't create token", 500);
-};
-
 // verify jwt token
 export const verifyToken = async (token: string) => {
 	try {
